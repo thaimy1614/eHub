@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: school-service
+  docker:
+    compose:
+      enabled: false
+
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      idle-timeout: 600000
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.format_sql: true # Định dạng SQL dễ đọc hơn
+  sql:
+    init:
+      encoding: UTF-8
+
+server:
+  port: 8082
+  servlet:
+    encoding:
+      charset: utf-8
+      force: true
+      enabled: true
+  error:
+    include-message: always # Bao gồm thông báo lỗi
+    include-binding-errors: always # Bao gồm lỗi liên quan đến ràng buộc
+    include-stacktrace: always # Bao gồm stacktrace trong phản hồi lỗi
+application:
+  api:
+    prefix: /school
+springdoc:
+  api-docs:
+    enabled: true # Bật Swagger API Docs
+    path: /school/v3/api-docs # Đường dẫn API Docs, kết hợp với prefix
+  swagger-ui:
+    enabled: true # Bật Swagger UI
+    path: /school/swagger-ui.html # Đường dẫn Swagger UI
+  servers: ${SWAGGER_SERVER}

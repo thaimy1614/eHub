@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: resource-service
+
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      idle-timeout: 600000
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      encoding: UTF-8
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+server:
+  port: 8086
+  servlet:
+    encoding:
+      charset: utf-8
+      force: true
+      enabled: true
+
+application:
+  api:
+    prefix: /resource
+
+springdoc:
+  api-docs:
+    path: '/resource/v3/api-docs'
+  swagger-ui:
+    operationsSorter: method
+    try-it-out-enabled: true
+    path: '/resource/swagger-ui.html'
+  servers: ${SWAGGER_SERVER}
+
+aws:
+  access:
+    key:
+      id: ${AWS_ACCESS_KEY_ID}
+  secret:
+    access:
+      key: ${AWS_SECRET_ACCESS_KEY}
+  s3:
+    region: ${AWS_S3_REGION}
+    bucket:
+      name: ${AWS_S3_BUCKET_NAME}

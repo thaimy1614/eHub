@@ -1,0 +1,6 @@
+services:
+#  school-service:
+#    build:
+#      context: .
+#    ports:
+#      - 8082:8082

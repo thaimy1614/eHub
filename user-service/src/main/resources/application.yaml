@@ -1,0 +1,88 @@
+spring:
+  main:
+    allow-circular-references: true
+  application:
+    name: user-service
+
+  data:
+    redis:
+      port: ${REDIS_PORT}
+      host: ${REDIS_HOST}
+
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      idle-timeout: 600000
+
+  kafka:
+    bootstrap-servers: ${KAFKA_1}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      retries: 1
+      acks: all
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        partitioner.class: org.apache.kafka.clients.producer.internals.DefaultPartitioner
+        linger.ms: 100  # Điều chỉnh thời gian chờ đợi để tối ưu hóa batching
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      encoding: UTF-8
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+outbound:
+  identity:
+    client-id: ${CLIENT_ID}
+    client-secret: ${CLIENT_SECRET}
+    redirect-uri: ${REDIRECT_URI}
+
+jwt:
+  signer-key: ${JWT_SIGNING_KEY}
+  expiration-duration: ${JWT_EXPIRATION_DURATION}
+  refreshable-duration: ${JWT_REFRESHABLE_DURATION}
+
+server:
+  forward-headers-strategy: framework
+  port: 8081
+  servlet:
+    encoding:
+      charset: utf-8
+      force: true
+      enabled: true
+
+application:
+  verify-redirect: "http://localhost:8081/user/count"
+  api:
+    prefix: /user
+    url: ${BACKEND_URL}
+  frontend:
+    url: ${FRONTEND_URL}
+
+springdoc:
+  api-docs:
+    path: '/user/v3/api-docs'
+  swagger-ui:
+    operationsSorter: method
+    try-it-out-enabled: true
+    path: '/user/swagger-ui.html'
+  servers: ${SWAGGER_SERVER}
