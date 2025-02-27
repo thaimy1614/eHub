@@ -1,0 +1,106 @@
+services:
+  ## API GATEWAY SERVICE ###
+  api-gateway:
+    build:
+      context: ./api-gateway
+    env_file:
+      - path: ./api-gateway/env/.env.docker
+    restart: on-failure
+    ports:
+      - 8888:8888
+  ## API GATEWAY SERVICE ###
+
+  ### USER SERVICE ###
+  user-service:
+    build:
+      context: ./user-service/
+    env_file:
+      - path: ./user-service/env/.env.docker
+    restart: on-failure
+    depends_on:
+      - kafka-1
+    ports:
+      - 8081:8081
+
+  redis-container:
+    image: docker.io/redis:7.2.3
+    restart: on-failure
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: [ "redis-server", "--bind", "0.0.0.0", "--protected-mode", "no" ]
+  ### USER SERVICE ###
+
+  ### SCHOOL SERVICE ###
+  school-service:
+    build:
+      context: ./school-service/
+    env_file:
+      - path: ./school-service/env/.env.docker
+    restart: on-failure
+    ports:
+      - 8082:8082
+  ### SCHOOL SERVICE ###
+
+  ### SUBJECT SERVICE ###
+  subject-service:
+    build:
+      context: ./subject-service/
+    restart: on-failure
+    ports:
+      - 8083:8080
+  ### SUBJECT SERVICE ###
+
+  ### RESOURCE SERVICE ###
+  resource-service:
+    build:
+      context: ./resource-service/
+    env_file:
+      - path: ./resource-service/env/.env.docker
+    restart: on-failure
+    ports:
+      - 8086:8086
+  ### RESOURCE SERVICE ###
+
+  ### NOTIFICATION SERVICE ###
+  notification-service:
+    build:
+      context: ./notification-service/
+    env_file:
+      - path: ./notification-service/env/.env.docker
+    restart: on-failure
+    ports:
+      - 8087:8087
+  ### NOTIFICATION SERVICE ###
+
+  ### Message Queue ###
+  zookeeper:
+    image: confluentinc/cp-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    restart: always
+
+  kafka-1:
+    image: confluentinc/cp-kafka
+    depends_on: [ zookeeper ]
+    restart: on-failure
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka-1:29092,OUTSIDE://localhost:9092
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  ### Message Queue ###
+
+volumes:
+  redis-data:
